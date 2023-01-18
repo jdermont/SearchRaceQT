@@ -16,6 +16,7 @@ SOURCES += \
 HEADERS += \
     game.h \
     mainwindow.h \
+    random.h \
     track.h
 
 FORMS += \

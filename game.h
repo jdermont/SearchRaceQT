@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include "random.h"
 
 using namespace std;
 
@@ -111,6 +112,7 @@ struct Game {
     uint64_t seed;
 
     Game(uint64_t seed = 0xdeadbeefULL) {
+        Random random(seed);
         if (seed == 0) seed = 0xdeadbeefULL;
         this->seed = seed;
         checkpoints.clear();
