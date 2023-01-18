@@ -110,8 +110,8 @@ struct Game {
     int rounds = 0;
     uint64_t seed;
 
-    Game(uint64_t seed = 0, bool toFit = false) {
-        if (seed == 0) seed = 11111111197613ULL;
+    Game(uint64_t seed = 0xdeadbeefULL) {
+        if (seed == 0) seed = 0xdeadbeefULL;
         this->seed = seed;
         checkpoints.clear();
         size_t r = 8 + nextInt(8);
@@ -123,7 +123,7 @@ struct Game {
                 int y = 600 + nextInt(7800);
                 for (auto & checkpoint : checkpoints) {
                     float dist = sqrtf((x-checkpoint.x)*(x-checkpoint.x)+(y-checkpoint.y)*(y-checkpoint.y));
-                    if (dist <= 1200) {
+                    if (dist <= 1800) {
                         collision = true;
                         break;
                     }
@@ -131,19 +131,14 @@ struct Game {
                 if (checkpoints.size() > 0) {
                     auto & c = checkpoints.back();
                     float dist = sqrtf((x-c.x)*(x-c.x)+(y-c.y)*(y-c.y));
-                    if (dist <= 1200) {
+                    if (dist <= 1800) {
                         collision = true;
                         break;
                     }
                 }
-                if (!toFit && collision) continue;
+                if (collision) continue;
                 checkpoints.push_back(Point(x,y));
             }
-        }
-        if (toFit) {
-            checkpoints.insert(checkpoints.end(), checkpoints.begin(), checkpoints.end()); //x2
-            checkpoints.insert(checkpoints.end(), checkpoints.begin(), checkpoints.end()); //x4
-            checkpoints.insert(checkpoints.end(), checkpoints.begin(), checkpoints.end()); //x8
         }
         car.x = checkpoints[checkpoints.size()-1].x;
         car.y = checkpoints[checkpoints.size()-1].y;

@@ -8,8 +8,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     resize(960,540);
     track = new Track(this);
+    ui->gridLayout->addWidget(track);
+    ui->gridLayout->addWidget(new QPushButton("test"));
 
-    MainWindow::setCentralWidget(track);
+//    MainWindow::setCentralWidget(track);
     track->setFocusPolicy(Qt::StrongFocus);
 }
 

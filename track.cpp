@@ -6,6 +6,7 @@ Track::Track(QWidget *parent) : QWidget(parent) {
 
 void Track::paintEvent(QPaintEvent *event) {
     QWidget::paintEvent(event);
+    calculateDimens();
 
     static const QPen white(QColor("#FFFFFF"), 1, Qt::SolidLine, Qt::RoundCap);
     static const QPen gray(QColor("#A0A0A0"), 1, Qt::SolidLine, Qt::RoundCap);
@@ -19,10 +20,11 @@ void Track::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing);
 
     QRect rect = event->rect();
+    rect.setRect(marginX, marginY, rect.width() - 2 * marginX, rect.height() - 2 * marginY);
     painter.fillRect(rect, WHITE);
 
     QFont font;
-    font.setPixelSize(320 / SCALE);
+    font.setPixelSize(getScaled(400));
     painter.setFont(font);
     painter.setPen(black);
 
@@ -33,20 +35,53 @@ void Track::paintEvent(QPaintEvent *event) {
         if (i == game.current) {
             QBrush brush(Qt::yellow);
             painter.setBrush(brush);
-            painter.drawEllipse(QPointF(p.x/SCALE, p.y/SCALE), 600/SCALE, 600/SCALE);
+            painter.drawEllipse(QPointF(marginX + getScaled(p.x), marginY + getScaled(p.y)), getScaled(600), getScaled(600));
             painter.setBrush(defaultBrush);
         }
-        painter.drawEllipse(QPointF(p.x/SCALE, p.y/SCALE), 600/SCALE, 600/SCALE);
+        painter.drawEllipse(QPointF(marginX + getScaled(p.x), marginY + getScaled(p.y)), getScaled(600), getScaled(600));
         if ((i+1)%(game.checkpoints.size()) > 9) {
-            painter.drawText(QPointF(p.x/SCALE - 12, p.y/SCALE + 4), QString::number((i+1)%(game.checkpoints.size())));
+            painter.drawText(QPointF(marginX + getScaled(p.x - 200), marginY + getScaled(p.y + 100)), QString::number((i+1)%(game.checkpoints.size())));
         } else {
-            painter.drawText(QPointF(p.x/SCALE - 6, p.y/SCALE + 4), QString::number((i+1)%(game.checkpoints.size())));
+            painter.drawText(QPointF(marginX + getScaled(p.x - 100), marginY + getScaled(p.y + 100)), QString::number((i+1)%(game.checkpoints.size())));
         }
     }
 
-    QRectF rectf(game.car.x/SCALE - 300/SCALE,game.car.y/SCALE - 150/SCALE,600/SCALE,300/SCALE);
+    QRectF rectf(marginX + getScaled(game.car.x - 300), marginY + getScaled(game.car.y - 150), getScaled(600), getScaled(300));
     rotate(&painter,rectf, game.car.angle, true);
     painter.drawRect(rectf);
-    painter.drawLine(game.car.x/SCALE,game.car.y/SCALE,game.car.x/SCALE+300/SCALE,game.car.y/SCALE);
+    painter.drawLine(marginX + getScaled(game.car.x), marginY + getScaled(game.car.y), marginX + getScaled(game.car.x+300), marginY + getScaled(game.car.y));
 
+}
+
+void Track::calculateDimens() {
+    float width = QWidget::width();
+    float height = QWidget::height();
+    float s = width / height;
+    if (s >= 16.0f/9.0f) {
+        scale = width / 16000.0f;
+        marginX = ((height * s) - ((16 * height) / 9));
+        marginX /= 2;
+        marginY = 0;
+        scale = (width - 2 * marginX) / 16000.0f;
+    } else {
+        scale = height / 9000.0f;
+        marginX = 0;
+        marginY = (width - (9.0f/16.0f) * s * width) / (2 * s);
+        scale = (height - 2 * marginY) / 9000.0f;
+    }
+}
+
+int Track::getScaled(int toScale) {
+    return (int)(scale * toScale);
+}
+
+float Track::getScaled(float toScale) {
+    return (scale * toScale);
+}
+
+void Track::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Space) {
+        game = Game(rand());
+    }
+    repaint();
 }

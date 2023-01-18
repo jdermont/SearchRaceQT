@@ -22,7 +22,7 @@ class Track : public QWidget {
 public:
     explicit Track(QWidget *parent = nullptr);
     virtual void paintEvent(QPaintEvent *);
-//    virtual void keyPressEvent(QKeyEvent *);
+    virtual void keyPressEvent(QKeyEvent *);
 //    Game game = Game("1000 4500;2500 3905;4000 5095;5500 3905;7000 5095;8500 3905;10000 5095;11500 3905");
 //    Game game = Game(15);
 
@@ -32,6 +32,13 @@ private:
         p->rotate(clock_wise ? angle : -angle);
         p->translate(-r.center());
     }
+
+    float scale;
+    float marginX, marginY;
+
+    void calculateDimens();
+    int getScaled(int);
+    float getScaled(float);
 
     Game game;
 };
